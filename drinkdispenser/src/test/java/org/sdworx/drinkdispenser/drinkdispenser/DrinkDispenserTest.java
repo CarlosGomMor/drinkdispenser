@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 import org.sdworx.drinkdispenser.drinkdispenser.exception.SoldOutException;
+import org.sdworx.drinkdispenser.drinkdispenser.model.Coin;
 import org.sdworx.drinkdispenser.drinkdispenser.model.Drink;
 import org.sdworx.drinkdispenser.drinkdispenser.model.Stock;
 
@@ -37,6 +38,22 @@ public class DrinkDispenserTest {
 		assertThrows(String.format(SOLD_OUT_MESSAGE, ORANJE_JUICE),SoldOutException.class,()-> dispenser.getStock(ORANJE_JUICE));
 	}
 	
+	@Test
+	public void insertCoin_GivenAcceptedCoin_ShouldBeAddedToAvailableAmountAndCoins() {
+		DrinkDispenser dispenser = new DrinkDispenser(fillStock());
+		
+		dispenser.insertCoin(Coin.FIVE_CENTS);
+		
+		assertTrue(dispenser.getAvailableAmount().equals(0.05));
+		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIVE_CENTS));
+		
+		dispenser.insertCoin(Coin.FIFTY_CENTS);
+		
+		assertTrue(dispenser.getAvailableAmount().equals(0.55));
+		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIVE_CENTS));
+		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIFTY_CENTS));
+	}
+	
 	private Stock fillStock () {
 		Stock stock = new Stock();
 		stock.add(new Drink(COCA, 1.0),2);
@@ -45,6 +62,8 @@ public class DrinkDispenserTest {
 		stock.add(new Drink(ORANJE_JUICE, 1.95),10);
 		return stock;
 	}
+	
+	
 	
 	
 }
