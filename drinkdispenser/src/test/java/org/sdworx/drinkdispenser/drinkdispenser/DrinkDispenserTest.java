@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
+import org.sdworx.drinkdispenser.drinkdispenser.exception.SoldOutException;
+import org.sdworx.drinkdispenser.drinkdispenser.model.Drink;
+import org.sdworx.drinkdispenser.drinkdispenser.model.Stock;
 
 public class DrinkDispenserTest {
 	
@@ -11,15 +14,16 @@ public class DrinkDispenserTest {
 	private String REDBULL = "Redbull";
 	private String WATER = "Water";
 	private String ORANJE_JUICE = "Orange juice";
+	private String SOLD_OUT_MESSAGE = "Drink %s is sold out";
 	
 	@Test
-	public void getStock_GivenDispenserHasStock_ShouldBeShown() {
+	public void getStock_GivenDispenserHasStock_ShouldBeShown() throws SoldOutException {
 		DrinkDispenser dispenser = new DrinkDispenser(fillStock());
 		
-		assertEquals(2, dispenser.getStock(COCA));
-		assertEquals(5, dispenser.getStock(REDBULL));
-		assertEquals(3, dispenser.getStock(WATER));
-		assertEquals(10, dispenser.getStock(ORANJE_JUICE));
+		assertEquals((Integer)2, dispenser.getStock(COCA));
+		assertEquals((Integer)5, dispenser.getStock(REDBULL));
+		assertEquals((Integer)3, dispenser.getStock(WATER));
+		assertEquals((Integer)10, dispenser.getStock(ORANJE_JUICE));
 		
 	}
 	
@@ -27,11 +31,10 @@ public class DrinkDispenserTest {
 	public void getStock_GivenDispenserDoesNotHaveStock_ShouldLaunchException() {
 		DrinkDispenser dispenser = new DrinkDispenser();
 	
-		assertThrows(SoldOutException.class, dispenser.getStock(COCA));
-		assertThrows(SoldOutException.class, dispenser.getStock(REDBULL));
-		assertThrows(SoldOutException.class, dispenser.getStock(WATER));
-		assertThrows(SoldOutException.class, dispenser.getStock(ORANJE_JUICE));
-		
+		assertThrows(String.format(SOLD_OUT_MESSAGE, COCA),SoldOutException.class,()-> dispenser.getStock(COCA));
+		assertThrows(String.format(SOLD_OUT_MESSAGE, REDBULL),SoldOutException.class,()-> dispenser.getStock(REDBULL));
+		assertThrows(String.format(SOLD_OUT_MESSAGE, WATER),SoldOutException.class,()-> dispenser.getStock(WATER));
+		assertThrows(String.format(SOLD_OUT_MESSAGE, ORANJE_JUICE),SoldOutException.class,()-> dispenser.getStock(ORANJE_JUICE));
 	}
 	
 	private Stock fillStock () {
@@ -42,4 +45,6 @@ public class DrinkDispenserTest {
 		stock.add(new Drink(ORANJE_JUICE, 1.95),10);
 		return stock;
 	}
+	
+	
 }
