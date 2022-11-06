@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class DrinkDispenserTest {
 	private String ORANJE_JUICE = "Orange juice";
 	private String SOLD_OUT_MESSAGE = "Drink %s is sold out";
 	private String CANCEL = "CANCEL";
+	private String NO_CHANGE_MESSAGE = "Not enough change available in the dispenser";
 	
 	@Test
 	public void getStock_GivenDispenserHasStock_ShouldBeShown() throws SoldOutException {
@@ -56,12 +58,12 @@ public class DrinkDispenserTest {
 		
 		dispenser.insertCoin(Coin.FIVE_CENTS);
 		
-		assertEquals(dispenser.getAvailableAmount(),Double.valueOf(0.05));
+		assertEquals(dispenser.getAvailableAmount(),BigDecimal.valueOf(0.05));
 		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIVE_CENTS));
 		
 		dispenser.insertCoin(Coin.FIFTY_CENTS);
 		
-		assertEquals(dispenser.getAvailableAmount(),Double.valueOf(0.55));
+		assertEquals(BigDecimal.valueOf(0.55),dispenser.getAvailableAmount());
 		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIVE_CENTS));
 		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIFTY_CENTS));
 	}
@@ -74,8 +76,8 @@ public class DrinkDispenserTest {
 		
 		EmployeeSelection selection;
 		selection = dispenser.getEmployeeSelection(REDBULL);
-		assertEquals(new Drink(REDBULL, Double.valueOf(1.25)), selection.getDrink());
-		assertEquals(Double.valueOf(0.75), selection.getChangeAmount());
+		assertEquals(new Drink(REDBULL, BigDecimal.valueOf(1.25)), selection.getDrink());
+		assertEquals(BigDecimal.valueOf(0.75), selection.getChangeAmount());
 		
 	}
 	
@@ -95,31 +97,19 @@ public class DrinkDispenserTest {
 		Collections.sort(selectionChangeCoins);
 		
 		assertEquals(coinsToCheckAgainst, selectionChangeCoins);
-		assertEquals(dispenser.getDispenserCoins().get(Coin.ONE_EURO), Integer.valueOf(9));
-		assertEquals(dispenser.getDispenserCoins().get(Coin.FIFTY_CENTS), Integer.valueOf(9));
+		assertEquals(Integer.valueOf(9),dispenser.getDispenserCoins().get(Coin.ONE_EURO) );
+		assertEquals(Integer.valueOf(9),dispenser.getDispenserCoins().get(Coin.FIFTY_CENTS) );
 		
 	}
 	
 	@Test
-	public void getEmployeeSelection_GivenThereIsNoAvailableChange_ShouldReturnInsertedCoins() throws SoldOutException, NotEnoughAvailableAmountException, NoChangeException {
+	public void getEmployeeSelection_GivenThereIsNoAvailableChange_ShouldRaiseException() throws SoldOutException, NotEnoughAvailableAmountException, NoChangeException {
 		DrinkDispenser dispenser = getFilledUpDispenserWithoutChange();
 
 		dispenser.insertCoin(Coin.ONE_EURO);
 		dispenser.insertCoin(Coin.ONE_EURO);
 		
-		List<Coin> coinsToCheckAgainst = Arrays.asList(Coin.ONE_EURO, Coin.ONE_EURO);
-		
-		EmployeeSelection selection = dispenser.getEmployeeSelection(WATER);
-		
-		Collections.sort(coinsToCheckAgainst);
-		
-		List<Coin> selectionChangeCoins = selection.getChangeCoins();
-		Collections.sort(selectionChangeCoins);
-		
-		assertNull(selection.getDrink());
-		
-		assertEquals(coinsToCheckAgainst, selectionChangeCoins);
-		
+		assertThrows(NO_CHANGE_MESSAGE,NoChangeException.class,()-> dispenser.getEmployeeSelection(WATER));
 	}
 	
 	@Test
@@ -165,10 +155,10 @@ public class DrinkDispenserTest {
 	
 	private Stock fillStock() {
 		Stock stock = new Stock();
-		stock.add(new Drink(COCA, 1.0),2);
-		stock.add(new Drink(REDBULL, 1.25),5);
-		stock.add(new Drink(WATER, 0.5),3);
-		stock.add(new Drink(ORANJE_JUICE, 1.95),10);
+		stock.add(new Drink(COCA, BigDecimal.valueOf(1)),2);
+		stock.add(new Drink(REDBULL, BigDecimal.valueOf(1.25)),5);
+		stock.add(new Drink(WATER, BigDecimal.valueOf(0.5)),3);
+		stock.add(new Drink(ORANJE_JUICE, BigDecimal.valueOf(1.95)),10);
 		return stock;
 	}
 	
