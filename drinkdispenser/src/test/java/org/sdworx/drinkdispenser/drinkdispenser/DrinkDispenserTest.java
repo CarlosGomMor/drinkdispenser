@@ -2,6 +2,7 @@ package org.sdworx.drinkdispenser.drinkdispenser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.sdworx.drinkdispenser.drinkdispenser.exception.SoldOutException;
@@ -21,10 +22,10 @@ public class DrinkDispenserTest {
 	public void getStock_GivenDispenserHasStock_ShouldBeShown() throws SoldOutException {
 		DrinkDispenser dispenser = new DrinkDispenser(fillStock());
 		
-		assertEquals((Integer)2, dispenser.getStock(COCA));
-		assertEquals((Integer)5, dispenser.getStock(REDBULL));
-		assertEquals((Integer)3, dispenser.getStock(WATER));
-		assertEquals((Integer)10, dispenser.getStock(ORANJE_JUICE));
+		assertEquals(Integer.valueOf(2), dispenser.getStock(COCA));
+		assertEquals(Integer.valueOf(5), dispenser.getStock(REDBULL));
+		assertEquals(Integer.valueOf(3), dispenser.getStock(WATER));
+		assertEquals(Integer.valueOf(10), dispenser.getStock(ORANJE_JUICE));
 		
 	}
 	
@@ -44,12 +45,12 @@ public class DrinkDispenserTest {
 		
 		dispenser.insertCoin(Coin.FIVE_CENTS);
 		
-		assertTrue(dispenser.getAvailableAmount().equals(0.05));
+		assertEquals(dispenser.getAvailableAmount(),Double.valueOf(0.05));
 		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIVE_CENTS));
 		
 		dispenser.insertCoin(Coin.FIFTY_CENTS);
 		
-		assertTrue(dispenser.getAvailableAmount().equals(0.55));
+		assertEquals(dispenser.getAvailableAmount(),Double.valueOf(0.55));
 		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIVE_CENTS));
 		assertTrue(dispenser.getAvailableCoins().contains(Coin.FIFTY_CENTS));
 	}
