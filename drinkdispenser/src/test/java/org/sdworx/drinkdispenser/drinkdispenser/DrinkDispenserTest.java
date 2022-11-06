@@ -39,7 +39,6 @@ public class DrinkDispenserTest {
 		assertEquals(Integer.valueOf(5), dispenser.getStock(REDBULL));
 		assertEquals(Integer.valueOf(3), dispenser.getStock(WATER));
 		assertEquals(Integer.valueOf(10), dispenser.getStock(ORANJE_JUICE));
-		
 	}
 	
 	@Test
@@ -78,7 +77,6 @@ public class DrinkDispenserTest {
 		selection = dispenser.getEmployeeSelection(REDBULL);
 		assertEquals(new Drink(REDBULL, BigDecimal.valueOf(1.25)), selection.getDrink());
 		assertEquals(BigDecimal.valueOf(0.75), selection.getChangeAmount());
-		
 	}
 	
 	@Test
@@ -99,7 +97,6 @@ public class DrinkDispenserTest {
 		assertEquals(coinsToCheckAgainst, selectionChangeCoins);
 		assertEquals(Integer.valueOf(9),dispenser.getDispenserCoins().get(Coin.ONE_EURO) );
 		assertEquals(Integer.valueOf(9),dispenser.getDispenserCoins().get(Coin.FIFTY_CENTS) );
-		
 	}
 	
 	@Test
@@ -141,9 +138,7 @@ public class DrinkDispenserTest {
 		dispenser.insertCoin(Coin.ONE_EURO);
 		
 		assertThrows(String.format(SOLD_OUT_MESSAGE, COCA),SoldOutException.class,()-> dispenser.getEmployeeSelection(COCA));
-		
 	}
-	
 	
 	private DrinkDispenser getFilledUpDrinkDispenser () {
 		return new DrinkDispenser(fillStock(), fillDispenserCoins());
@@ -172,13 +167,7 @@ public class DrinkDispenserTest {
 		coinsToAdd.put(Coin.TWO_EURO, Integer.valueOf(10));
 		coinsToAdd.put(Coin.TWENTY_CENTS, Integer.valueOf(30));
 		
-		
-		
 		return coinsToAdd;
-		
 	}
-	
-	
-	
 	
 }
