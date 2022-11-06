@@ -30,6 +30,7 @@ public class DrinkDispenserTest {
 	private String SOLD_OUT_MESSAGE = "Drink %s is sold out";
 	private String CANCEL = "CANCEL";
 	private String NO_CHANGE_MESSAGE = "Not enough change available in the dispenser";
+	private String NOT_ENOUGH_AMOUNT_MESSAGE = "Drink $s costs $f. Select another drink or insert more coins";
 	
 	@Test
 	public void getStock_GivenDispenserHasStock_ShouldBeShown() throws SoldOutException {
@@ -138,6 +139,15 @@ public class DrinkDispenserTest {
 		dispenser.insertCoin(Coin.ONE_EURO);
 		
 		assertThrows(String.format(SOLD_OUT_MESSAGE, COCA),SoldOutException.class,()-> dispenser.getEmployeeSelection(COCA));
+	}
+	
+	@Test
+	public void getEmployeeSelection_GivenNotEnoughAvailableAmount_ShouldRaiseException () {
+		DrinkDispenser dispenser = getFilledUpDrinkDispenser();
+
+		dispenser.insertCoin(Coin.ONE_EURO);
+		
+		assertThrows(String.format(NOT_ENOUGH_AMOUNT_MESSAGE, REDBULL, BigDecimal.valueOf(1.25)),NotEnoughAvailableAmountException.class,()-> dispenser.getEmployeeSelection(REDBULL));
 	}
 	
 	private DrinkDispenser getFilledUpDrinkDispenser () {
