@@ -1,6 +1,7 @@
 package org.sdworx.drinkdispenser.drinkdispenser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -11,9 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.sdworx.drinkdispenser.drinkdispenser.exception.NoChangeException;
+import org.sdworx.drinkdispenser.drinkdispenser.exception.NotEnoughAvailableAmountException;
 import org.sdworx.drinkdispenser.drinkdispenser.exception.SoldOutException;
 import org.sdworx.drinkdispenser.drinkdispenser.model.Coin;
 import org.sdworx.drinkdispenser.drinkdispenser.model.Drink;
+import org.sdworx.drinkdispenser.drinkdispenser.model.EmployeeSelection;
 import org.sdworx.drinkdispenser.drinkdispenser.model.Stock;
 
 public class DrinkDispenserTest {
@@ -63,19 +67,20 @@ public class DrinkDispenserTest {
 	}
 	
 	@Test
-	public void getEmployeeSelection_GivenThereIsAvailableAmountAndDrink_ShouldReturnDrinkAndChange() {
+	public void getEmployeeSelection_GivenThereIsAvailableAmountAndDrink_ShouldReturnDrinkAndChange() throws SoldOutException, NotEnoughAvailableAmountException, NoChangeException {
 		DrinkDispenser dispenser = getFilledUpDrinkDispenser();
 
 		dispenser.insertCoin(Coin.TWO_EURO);
 		
-		EmployeeSelection selection = dispenser.getEmployeeSelection(REDBULL);
-		
+		EmployeeSelection selection;
+		selection = dispenser.getEmployeeSelection(REDBULL);
 		assertEquals(new Drink(REDBULL, Double.valueOf(1.25)), selection.getDrink());
 		assertEquals(Double.valueOf(0.75), selection.getChangeAmount());
+		
 	}
 	
 	@Test
-	public void getEmployeeSelection_GivenThereIsAvailableCoinsInDispenser_ShouldReturnCorrectCoinsAndShouldBeSubstractedFromDispenser() {
+	public void getEmployeeSelection_GivenThereIsAvailableCoinsInDispenser_ShouldReturnCorrectCoinsAndShouldBeSubstractedFromDispenser() throws SoldOutException, NotEnoughAvailableAmountException, NoChangeException {
 		DrinkDispenser dispenser = getFilledUpDrinkDispenser();
 
 		dispenser.insertCoin(Coin.TWO_EURO);
@@ -83,16 +88,20 @@ public class DrinkDispenserTest {
 		EmployeeSelection selection = dispenser.getEmployeeSelection(WATER);
 		
 		List<Coin> coinsToCheckAgainst = Arrays.asList(Coin.ONE_EURO, Coin.FIFTY_CENTS);
+		Collections.sort(coinsToCheckAgainst);
 		
-		assertEquals(Collections.sort(coinsToCheckAgainst), Collections.sort(selection.getChangeCoins()));
+		List<Coin> selectionChangeCoins = selection.getChangeCoins();
 		
+		Collections.sort(selectionChangeCoins);
+		
+		assertEquals(coinsToCheckAgainst, selectionChangeCoins);
 		assertEquals(dispenser.getDispenserCoins().get(Coin.ONE_EURO), Integer.valueOf(9));
 		assertEquals(dispenser.getDispenserCoins().get(Coin.FIFTY_CENTS), Integer.valueOf(9));
 		
 	}
 	
 	@Test
-	public void getEmployeeSelection_GivenThereIsNoAvailableChange_ShouldReturnInsertedCoins() {
+	public void getEmployeeSelection_GivenThereIsNoAvailableChange_ShouldReturnInsertedCoins() throws SoldOutException, NotEnoughAvailableAmountException, NoChangeException {
 		DrinkDispenser dispenser = getFilledUpDispenserWithoutChange();
 
 		dispenser.insertCoin(Coin.ONE_EURO);
@@ -100,16 +109,21 @@ public class DrinkDispenserTest {
 		
 		List<Coin> coinsToCheckAgainst = Arrays.asList(Coin.ONE_EURO, Coin.ONE_EURO);
 		
-		EmployeeSelection selection = dispenser.getEmployeeSelection(CANCEL);
+		EmployeeSelection selection = dispenser.getEmployeeSelection(WATER);
+		
+		Collections.sort(coinsToCheckAgainst);
+		
+		List<Coin> selectionChangeCoins = selection.getChangeCoins();
+		Collections.sort(selectionChangeCoins);
 		
 		assertNull(selection.getDrink());
 		
-		assertEquals(Collections.sort(coinsToCheckAgainst), Collections.sort(selection.getChangeCoins()));
+		assertEquals(coinsToCheckAgainst, selectionChangeCoins);
 		
 	}
 	
 	@Test
-	public void getEmployeeSelection_Cancel_ShouldReturnInsertedCoins() {
+	public void getEmployeeSelection_Cancel_ShouldReturnInsertedCoins() throws SoldOutException, NotEnoughAvailableAmountException, NoChangeException {
 		DrinkDispenser dispenser = getFilledUpDispenserWithoutChange();
 
 		dispenser.insertCoin(Coin.FIFTY_CENTS);
@@ -117,11 +131,27 @@ public class DrinkDispenserTest {
 		
 		List<Coin> coinsToCheckAgainst = Arrays.asList(Coin.ONE_EURO, Coin.FIFTY_CENTS);
 		
-		EmployeeSelection selection = dispenser.getEmployeeSelection(WATER);
+		EmployeeSelection selection = dispenser.getEmployeeSelection(CANCEL);
+		
+		Collections.sort(coinsToCheckAgainst);
+		
+		List<Coin> selectionChangeCoins = selection.getChangeCoins();
+		Collections.sort(selectionChangeCoins);
 		
 		assertNull(selection.getDrink());
 		
-		assertEquals(Collections.sort(coinsToCheckAgainst), Collections.sort(selection.getChangeCoins()));
+		assertEquals(coinsToCheckAgainst,selectionChangeCoins);
+	}
+	
+	@Test
+	public void getEmployeeSelection_GivenNotEnoughStock_ShouldThrowException () {
+		DrinkDispenser dispenser = new DrinkDispenser();
+		
+		dispenser.insertCoin(Coin.FIFTY_CENTS);
+		dispenser.insertCoin(Coin.ONE_EURO);
+		
+		assertThrows(String.format(SOLD_OUT_MESSAGE, COCA),SoldOutException.class,()-> dispenser.getEmployeeSelection(COCA));
+		
 	}
 	
 	
