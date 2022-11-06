@@ -1,20 +1,27 @@
 package org.sdworx.drinkdispenser.drinkdispenser.model;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Drink {
 	private final String name;
-	private final Double price;
+	private final BigDecimal price;
 	
-	public Drink(String name, Double price) {
+	public Drink(String name, BigDecimal price) {
 		super();
 		this.name = name;
 		this.price = price;
 	}
+	
+	public Drink(String name) {
+		super();
+		this.name = name;
+		this.price = BigDecimal.ZERO;
+	}
 	public String getName() {
 		return name;
 	}
-	public Double getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 	

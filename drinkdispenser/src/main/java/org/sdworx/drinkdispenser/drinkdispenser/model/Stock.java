@@ -1,13 +1,16 @@
 package org.sdworx.drinkdispenser.drinkdispenser.model;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.sdworx.drinkdispenser.drinkdispenser.exception.SoldOutException;
 
 public class Stock {
 	
-	private Integer ZERO = 0;
+	private Integer ZERO = Integer.valueOf(0);
+	private Integer ONE = Integer.valueOf(1);
 	
 	Map<Drink, Integer> drinks = new HashMap<Drink, Integer>();
 	
@@ -31,5 +34,20 @@ public class Stock {
 		}
 		
 		return result;
+	}
+	
+	public void getDrinkFromStock (Drink drink) throws SoldOutException {
+		
+		drinks.put(drink, getStock(drink)-ONE);
+	}
+	
+	public BigDecimal getDrinkPrice (String drink) throws SoldOutException {
+		BigDecimal price = null;
+		try {
+			price = drinks.keySet().stream().filter(d->d.equals(new Drink(drink))).findAny().get().getPrice();
+		} catch (NoSuchElementException e) {
+			throw new SoldOutException("Drink "+drink+" is sold out");
+		}
+		return price;
 	}
 }

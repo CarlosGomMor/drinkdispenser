@@ -1,20 +1,22 @@
 package org.sdworx.drinkdispenser.drinkdispenser.model;
 
+import java.math.BigDecimal;
+
 public enum Coin {
-	FIVE_CENTS(0.05),
-	TEN_CENTS(0.1),
-	TWENTY_CENTS(0.2),
-	FIFTY_CENTS(0.5),
-	ONE_EURO(1.0),
-	TWO_EURO(2.0);
+	FIVE_CENTS(BigDecimal.valueOf(0.05)),
+	TEN_CENTS(BigDecimal.valueOf(0.1)),
+	TWENTY_CENTS(BigDecimal.valueOf(0.2)),
+	FIFTY_CENTS(BigDecimal.valueOf(0.5)),
+	ONE_EURO(BigDecimal.valueOf(1.0)),
+	TWO_EURO(BigDecimal.valueOf(2.0));
 	
-	private Double value;
+	private BigDecimal value;
 	
-	public Double getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
 
-	private Coin(Double value) {
+	private Coin(BigDecimal value) {
 		this.value = value;
 	}
 
